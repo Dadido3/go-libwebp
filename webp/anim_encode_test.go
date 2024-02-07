@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tidbyt/go-libwebp/test/util"
-	"github.com/tidbyt/go-libwebp/webp"
+	"github.com/Dadido3/go-libwebp/test/util"
+	"github.com/Dadido3/go-libwebp/webp"
 )
 
 func TestEncodeAnimation(t *testing.T) {

@@ -1,15 +1,16 @@
-go-libwebp
-==========
+<!-- markdownlint-disable MD010 -->
 
-[![GoDoc](https://godoc.org/github.com/tidbyt/go-libwebp/webp?status.svg)](https://godoc.org/github.com/tidbyt/go-libwebp/webp)
+# go-libwebp
+
+[![GoDoc](https://pkg.go.dev/badge/github.com/Dadido3/go-libwebp/webp?utm_source=godoc)](https://pkg.go.dev/badge/github.com/Dadido3/go-libwebp/webp)
 
 A implementation of Go binding for [libwebp](https://developers.google.com/speed/webp/docs/api).
 
-Originally forked from [harukasan/go-libwebp](https://github.com/harukasan/go-libwebp).
+Forked from [tidbyt/go-libwebp](https://github.com/tidbyt/go-libwebp), which itself was forked from [harukasan/go-libwebp](https://github.com/harukasan/go-libwebp).
 
 ## Dependencies
 
-- libwebp 0.5+, compiled with `--enable-libwebpmux`
+No external dependencies are needed, as this version of go-libwebp includes the libwebp 1.3.2 source.
 
 ## Usage
 
@@ -17,7 +18,7 @@ The [examples](./examples) directory contains example codes and images.
 
 ### Decoding WebP into image.RGBA
 
-```
+``` go
 package main
 
 import (
@@ -46,15 +47,15 @@ You can set more decoding options such as cropping, flipping and scaling.
 
 ### Encoding WebP from image.RGBA
 
-```
+``` go
 package main
 
 import (
 	"bufio"
 	"image"
 
-	"github.com/tidbyt/go-libwebp/test/util"
-	"github.com/tidbyt/go-libwebp/webp"
+	"github.com/Dadido3/go-libwebp/test/util"
+	"github.com/Dadido3/go-libwebp/webp"
 )
 
 func main() {
@@ -77,18 +78,17 @@ func main() {
 }
 ```
 
-
 ### Encoding animations from a series of frames
 
-```
+``` go
 package main
 
 import (
 	"image"
 	"time"
 
-	"github.com/tidbyt/go-libwebp/test/util"
-	"github.com/tidbyt/go-libwebp/webp"
+	"github.com/Dadido3/go-libwebp/test/util"
+	"github.com/Dadido3/go-libwebp/webp"
 )
 
 func main() {

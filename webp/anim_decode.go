@@ -1,8 +1,6 @@
 package webp
 
 /*
-#cgo LDFLAGS: -lwebpdemux
-
 #include <stdlib.h>
 #include <webp/demux.h>
 */

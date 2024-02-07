@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tidbyt/go-libwebp/test/util"
-	"github.com/tidbyt/go-libwebp/webp"
+	"github.com/Dadido3/go-libwebp/test/util"
+	"github.com/Dadido3/go-libwebp/webp"
 )
 
 func TestDecodeAnimationInfo(t *testing.T) {
@@ -19,7 +19,7 @@ func TestDecodeAnimationInfo(t *testing.T) {
 
 	info, err := dec.GetInfo()
 	if err != nil {
-		t.Fatalf("getting animatiion info: %v", err)
+		t.Fatalf("getting animation info: %v", err)
 	}
 
 	if got := info.CanvasWidth; got != 64 {

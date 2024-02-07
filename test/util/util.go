@@ -1,4 +1,4 @@
-// Package util contains utility code for demosntration of go-libwebp.
+// Package util contains utility code for demonstration of go-libwebp.
 package util
 
 import (
@@ -7,14 +7,13 @@ import (
 	"image"
 	"image/png"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
 // GetExFilePath returns the path of specified example file.
 func GetExFilePath(name string) string {
-	path := filepath.Join("../examples/images", name)
+	path := filepath.Join("..", "images", name)
 	if _, err := os.Stat(path); err == nil {
 		return path
 	}
@@ -23,7 +22,7 @@ func GetExFilePath(name string) string {
 
 // GetOutFilePath returns the path of specified out file.
 func GetOutFilePath(name string) string {
-	path := "../examples/out"
+	path := filepath.Join("..", "out")
 	if _, err := os.Stat(path); err == nil {
 		return filepath.Join(path, name)
 	}
@@ -41,7 +40,7 @@ func OpenFile(name string) (io io.Reader) {
 
 // ReadFile reads and returns data bytes of specified example file.
 func ReadFile(name string) (data []byte) {
-	data, err := ioutil.ReadFile(GetExFilePath(name))
+	data, err := os.ReadFile(GetExFilePath(name))
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +71,6 @@ func WritePNG(img image.Image, name string) {
 	if err := png.Encode(b, img); err != nil {
 		panic(err)
 	}
-	return
 }
 
 // ReadPNG reads and decodes png data into image.Image

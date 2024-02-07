@@ -28,14 +28,14 @@ type DecoderOptions struct {
 	AlphaDitheringStrength int             // Specify alpha dithering strength in [0..100]
 }
 
-// BitstreamFeatures represents the image properties which are retrived from
+// BitstreamFeatures represents the image properties which are retrieved from
 // data stream.
 type BitstreamFeatures struct {
-	Width        int  // Image width in pixels
-	Height       int  // Image height in pixles
+	Width        int  // Image width in pixels.
+	Height       int  // Image height in pixels.
 	HasAlpha     bool // True if data stream contains a alpha channel.
-	HasAnimation bool // True if data stream is an animation
-	Format       int  // Image compression format
+	HasAnimation bool // True if data stream is an animation.
+	Format       int  // Image compression format.
 }
 
 // GetDecoderVersion returns decoder's version number, packed in hexadecimal.
@@ -44,14 +44,14 @@ func GetDecoderVersion() (v int) {
 	return int(C.WebPGetDecoderVersion())
 }
 
-// GetInfo retrives width/height from data bytes.
+// GetInfo retrieves width/height from data bytes.
 func GetInfo(data []byte) (width, height int) {
 	var w, h C.int
 	C.WebPGetInfo((*C.uint8_t)(&data[0]), (C.size_t)(len(data)), &w, &h)
 	return int(w), int(h)
 }
 
-// GetFeatures returns features as BitstreamFeatures retrived from data stream.
+// GetFeatures returns features as BitstreamFeatures retrieved from data stream.
 func GetFeatures(data []byte) (f *BitstreamFeatures, err error) {
 	var cf C.WebPBitstreamFeatures
 	status := C.WebPGetFeatures((*C.uint8_t)(&data[0]), (C.size_t)(len(data)), &cf)
@@ -61,7 +61,7 @@ func GetFeatures(data []byte) (f *BitstreamFeatures, err error) {
 	}
 
 	f = &BitstreamFeatures{
-		Width:        int(cf.width), // TODO: use Rectangle instaed?
+		Width:        int(cf.width), // TODO: use Rectangle instead?
 		Height:       int(cf.height),
 		HasAlpha:     cf.has_alpha > 0,
 		HasAnimation: cf.has_animation > 0,
@@ -81,7 +81,7 @@ func DecodeYUVA(data []byte, options *DecoderOptions) (img *YUVAImage, err error
 	cDataPtr := (*C.uint8_t)(&data[0])
 	cDataSize := (C.size_t)(len(data))
 
-	// Retrive WebP features from data stream
+	// Retrieve WebP features from data stream.
 	if status := C.WebPGetFeatures(cDataPtr, cDataSize, &config.input); status != C.VP8_STATUS_OK {
 		return nil, fmt.Errorf("Could not get features from the data stream, return %s", statusString(status))
 	}
@@ -136,7 +136,7 @@ func DecodeRGBA(data []byte, options *DecoderOptions) (img *image.RGBA, err erro
 	cDataPtr := (*C.uint8_t)(&data[0])
 	cDataSize := (C.size_t)(len(data))
 
-	// Retrive WebP features
+	// Retrieve WebP features.
 	if status := C.WebPGetFeatures(cDataPtr, cDataSize, &config.input); status != C.VP8_STATUS_OK {
 		return nil, fmt.Errorf("Could not get features from the data stream, return %s", statusString(status))
 	}
@@ -163,7 +163,7 @@ func DecodeRGBA(data []byte, options *DecoderOptions) (img *image.RGBA, err erro
 	return
 }
 
-// sattusString convert the VP8StatsCode to string.
+// statusString converts the VP8StatsCode into a string.
 func statusString(status C.VP8StatusCode) string {
 	switch status {
 	case C.VP8_STATUS_OK:
@@ -186,7 +186,7 @@ func statusString(status C.VP8StatusCode) string {
 	return "Unexpected Status Code"
 }
 
-// initDecoderConfing initializes a decoder configration and sets up the options.
+// initDecoderConfig initializes a decoder configuration and sets up the options.
 func initDecoderConfig(options *DecoderOptions) (config *C.WebPDecoderConfig, err error) {
 	// Initialize decoder config
 	config = &C.WebPDecoderConfig{}
@@ -221,7 +221,7 @@ func initDecoderConfig(options *DecoderOptions) (config *C.WebPDecoderConfig, er
 	return
 }
 
-// calcOutputSize retrives width and height of output image from the decoder configuration.
+// calcOutputSize retrieves width and height of output image from the decoder configuration.
 func calcOutputSize(config *C.WebPDecoderConfig) (width, height int) {
 	options := config.options
 	if options.use_scaling > 0 {

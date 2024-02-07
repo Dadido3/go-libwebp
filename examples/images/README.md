@@ -1,5 +1,4 @@
-Example Images
-==============
+# Example Images
 
 This directory contains example WebP encoded files and PNG source files.
 

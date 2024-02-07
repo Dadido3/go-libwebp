@@ -3,13 +3,17 @@
 package webp
 
 /*
-#cgo LDFLAGS: -lwebp -lm
+#cgo CFLAGS: -I./../libwebp/src/
+#cgo CFLAGS: -Wno-pointer-sign -DWEBP_USE_THREAD
+#cgo !windows LDFLAGS: -lm
 
 #include <stdlib.h>
 #include <webp/encode.h>
 
 */
 import "C"
+
+import _ "github.com/Dadido3/go-libwebp/webp/wrapper"
 
 // ColorSpace represents encoding color space in WebP
 type ColorSpace int
