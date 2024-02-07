@@ -17,6 +17,7 @@
         "kmin",
         "LDFLAGS",
         "libwebp",
+        "lossily",
         "malloc",
         "memcpy",
         "memset",
@@ -31,6 +32,7 @@
         "tidbyt",
         "Upsampling",
         "webp",
+        "WEBPVP",
         "YUVA"
     ]
 }

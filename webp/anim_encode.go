@@ -55,12 +55,12 @@ func NewAnimationEncoder(width, height, kmin, kmax int) (*AnimationEncoder, erro
 func (ae *AnimationEncoder) AddFrame(img image.Image, duration time.Duration) error {
 	pic := C.calloc_WebPPicture()
 	if pic == nil {
-		return errors.New("Could not allocate webp picture")
+		return errors.New("could not allocate webp picture")
 	}
 	defer C.free_WebPPicture(pic)
 
 	if C.WebPPictureInit(pic) == 0 {
-		return errors.New("Could not initialize webp picture")
+		return errors.New("could not initialize webp picture")
 	}
 	defer C.WebPPictureFree(pic)
 
@@ -87,7 +87,7 @@ func (ae *AnimationEncoder) AddFrame(img image.Image, duration time.Duration) er
 
 	if C.WebPAnimEncoderAdd(ae.c, pic, timestamp, nil) == 0 {
 		return fmt.Errorf(
-			"Encoding error: %d - %s",
+			"encoding error: %d - %s",
 			int(pic.error_code),
 			C.GoString(C.WebPAnimEncoderGetError(ae.c)),
 		)
@@ -100,7 +100,7 @@ func (ae *AnimationEncoder) AddFrame(img image.Image, duration time.Duration) er
 func (ae *AnimationEncoder) Assemble() ([]byte, error) {
 	// add final empty frame
 	if C.WebPAnimEncoderAdd(ae.c, nil, C.int(ae.duration/time.Millisecond), nil) == 0 {
-		return nil, errors.New("Couldn't add final empty frame")
+		return nil, errors.New("couldn't add final empty frame")
 	}
 
 	data := &C.WebPData{}
@@ -108,7 +108,7 @@ func (ae *AnimationEncoder) Assemble() ([]byte, error) {
 	defer C.WebPDataClear(data)
 
 	if C.WebPAnimEncoderAssemble(ae.c, data) == 0 {
-		return nil, errors.New("Error assembling animation")
+		return nil, errors.New("error assembling animation")
 	}
 
 	size := int(data.size)
@@ -121,7 +121,7 @@ func (ae *AnimationEncoder) Assemble() ([]byte, error) {
 	)
 
 	if n != size {
-		return nil, errors.New("Error copying animation from C to Go")
+		return nil, errors.New("error copying animation from C to Go")
 	}
 
 	return out, nil

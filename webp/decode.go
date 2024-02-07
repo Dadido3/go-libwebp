@@ -13,8 +13,12 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"image/color"
+	"io"
 	"unsafe"
 )
+
+const webPHeader = "RIFF????WEBPVP8"
 
 // DecoderOptions specifies decoding options of WebP.
 type DecoderOptions struct {
@@ -35,7 +39,7 @@ type BitstreamFeatures struct {
 	Height       int  // Image height in pixels.
 	HasAlpha     bool // True if data stream contains a alpha channel.
 	HasAnimation bool // True if data stream is an animation.
-	Format       int  // Image compression format.
+	Format       int  // 0 = undefined (/mixed), 1 = lossy, 2 = lossless.
 }
 
 // GetDecoderVersion returns decoder's version number, packed in hexadecimal.
@@ -57,7 +61,7 @@ func GetFeatures(data []byte) (f *BitstreamFeatures, err error) {
 	status := C.WebPGetFeatures((*C.uint8_t)(&data[0]), (C.size_t)(len(data)), &cf)
 
 	if status != C.VP8_STATUS_OK {
-		return nil, fmt.Errorf("WebPGetFeatures returns unexpected status: %s", statusString(status))
+		return nil, fmt.Errorf("unexpected VP8 status: %s", statusString(status))
 	}
 
 	f = &BitstreamFeatures{
@@ -83,7 +87,7 @@ func DecodeYUVA(data []byte, options *DecoderOptions) (img *YUVAImage, err error
 
 	// Retrieve WebP features from data stream.
 	if status := C.WebPGetFeatures(cDataPtr, cDataSize, &config.input); status != C.VP8_STATUS_OK {
-		return nil, fmt.Errorf("Could not get features from the data stream, return %s", statusString(status))
+		return nil, fmt.Errorf("could not get features from the data stream, return %s", statusString(status))
 	}
 
 	outWidth, outHeight := calcOutputSize(config)
@@ -120,7 +124,7 @@ func DecodeYUVA(data []byte, options *DecoderOptions) (img *YUVAImage, err error
 	}
 
 	if status := C.WebPDecode(cDataPtr, cDataSize, config); status != C.VP8_STATUS_OK {
-		return nil, fmt.Errorf("Could not decode data stream, return %s", statusString(status))
+		return nil, fmt.Errorf("could not decode data stream, return %s", statusString(status))
 	}
 
 	return
@@ -138,7 +142,7 @@ func DecodeRGBA(data []byte, options *DecoderOptions) (img *image.RGBA, err erro
 
 	// Retrieve WebP features.
 	if status := C.WebPGetFeatures(cDataPtr, cDataSize, &config.input); status != C.VP8_STATUS_OK {
-		return nil, fmt.Errorf("Could not get features from the data stream, return %s", statusString(status))
+		return nil, fmt.Errorf("could not get features from the data stream, return %s", statusString(status))
 	}
 
 	// Allocate output image
@@ -157,10 +161,39 @@ func DecodeRGBA(data []byte, options *DecoderOptions) (img *image.RGBA, err erro
 
 	// Decode
 	if status := C.WebPDecode(cDataPtr, cDataSize, config); status != C.VP8_STATUS_OK {
-		return nil, fmt.Errorf("Could not decode data stream, return %s", statusString(status))
+		return nil, fmt.Errorf("could not decode data stream, return %s", statusString(status))
 	}
 
 	return
+}
+
+// Decode reads a WebP image from r and returns it as an [image.Image].
+// The type of Image returned depends on the WebP contents.
+func Decode(r io.Reader) (image.Image, error) {
+	// TODO: Find a way not to use ReadAll here
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return DecodeRGBA(data, nil)
+}
+
+// DecodeConfig returns the color model and dimensions of a WebP image without
+// decoding the entire image.
+func DecodeConfig(r io.Reader) (image.Config, error) {
+	// TODO: Find a way not to use ReadAll here
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return image.Config{}, err
+	}
+
+	features, err := GetFeatures(data)
+	if err != nil {
+		return image.Config{}, err
+	}
+
+	return image.Config{ColorModel: color.RGBAModel, Width: features.Width, Height: features.Height}, nil
 }
 
 // statusString converts the VP8StatsCode into a string.
@@ -191,7 +224,11 @@ func initDecoderConfig(options *DecoderOptions) (config *C.WebPDecoderConfig, er
 	// Initialize decoder config
 	config = &C.WebPDecoderConfig{}
 	if C.WebPInitDecoderConfig(config) == 0 {
-		return nil, errors.New("Could not initialize decoder config")
+		return nil, errors.New("could not initialize decoder config")
+	}
+
+	if options == nil {
+		options = &DecoderOptions{}
 	}
 
 	// Set up decoder options
@@ -238,4 +275,8 @@ func calcOutputSize(config *C.WebPDecoderConfig) (width, height int) {
 	width = int(config.input.width)
 	height = int(config.input.height)
 	return
+}
+
+func init() {
+	image.RegisterFormat("webp", webPHeader, Decode, DecodeConfig)
 }

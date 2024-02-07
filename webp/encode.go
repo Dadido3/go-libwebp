@@ -106,6 +106,7 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"image/draw"
 	"io"
 	"sync"
 	"unsafe"
@@ -456,7 +457,6 @@ func writeWebP(data *C.uint8_t, size C.size_t, pic *C.WebPPicture) C.int {
 }
 
 // EncodeRGBA encodes and writes image.Image into the writer as WebP.
-// Now supports image.RGBA or image.NRGBA.
 func EncodeRGBA(w io.Writer, img image.Image, c *Config) (err error) {
 	if err = validateConfig(c); err != nil {
 		return
@@ -464,7 +464,7 @@ func EncodeRGBA(w io.Writer, img image.Image, c *Config) (err error) {
 
 	pic := C.calloc_WebPPicture()
 	if pic == nil {
-		return errors.New("Could not allocate webp picture")
+		return errors.New("could not allocate webp picture")
 	}
 	defer C.free_WebPPicture(pic)
 
@@ -472,7 +472,7 @@ func EncodeRGBA(w io.Writer, img image.Image, c *Config) (err error) {
 	defer releaseDestinationManager(pic)
 
 	if C.WebPPictureInit(pic) == 0 {
-		return errors.New("Could not initialize webp picture")
+		return errors.New("could not initialize webp picture")
 	}
 	defer C.WebPPictureFree(pic)
 
@@ -488,14 +488,17 @@ func EncodeRGBA(w io.Writer, img image.Image, c *Config) (err error) {
 		C.WebPPictureImportRGB(pic, (*C.uint8_t)(&p.Pix[0]), C.int(p.Stride))
 	case *image.RGBA:
 		C.WebPPictureImportRGBA(pic, (*C.uint8_t)(&p.Pix[0]), C.int(p.Stride))
-	case *image.NRGBA:
+	case *image.NRGBA: // TODO: Do we need to differentiate here when we export premultiplied vs non-premultiplied alpha?
 		C.WebPPictureImportRGBA(pic, (*C.uint8_t)(&p.Pix[0]), C.int(p.Stride))
 	default:
-		return errors.New("unsupported image type")
+		// Fall back to generic implementation.
+		tempImage := image.NewNRGBA(p.Bounds())
+		draw.Draw(tempImage, tempImage.Bounds(), p, p.Bounds().Min, draw.Src)
+		C.WebPPictureImportRGBA(pic, (*C.uint8_t)(&tempImage.Pix[0]), C.int(tempImage.Stride))
 	}
 
 	if C.WebPEncode(&c.c, pic) == 0 {
-		return fmt.Errorf("Encoding error: %d", pic.error_code)
+		return fmt.Errorf("encoding error: %d", pic.error_code)
 	}
 
 	return
@@ -508,7 +511,7 @@ func EncodeGray(w io.Writer, p *image.Gray, c *Config) (err error) {
 
 	pic := C.calloc_WebPPicture()
 	if pic == nil {
-		return errors.New("Could not allocate webp picture")
+		return errors.New("could not allocate webp picture")
 	}
 	defer C.free_WebPPicture(pic)
 
@@ -516,7 +519,7 @@ func EncodeGray(w io.Writer, p *image.Gray, c *Config) (err error) {
 	defer releaseDestinationManager(pic)
 
 	if C.WebPPictureInit(pic) == 0 {
-		return errors.New("Could not initialize webp picture")
+		return errors.New("could not initialize webp picture")
 	}
 	defer C.WebPPictureFree(pic)
 
@@ -526,7 +529,7 @@ func EncodeGray(w io.Writer, p *image.Gray, c *Config) (err error) {
 	pic.y_stride = C.int(p.Stride)
 
 	if C.webpEncodeGray(&c.c, pic, (*C.uint8_t)(&p.Pix[0])) == 0 {
-		return fmt.Errorf("Encoding error: %d", pic.error_code)
+		return fmt.Errorf("encoding error: %d", pic.error_code)
 	}
 
 	return
@@ -540,7 +543,7 @@ func EncodeYUVA(w io.Writer, img *YUVAImage, c *Config) (err error) {
 
 	pic := C.calloc_WebPPicture()
 	if pic == nil {
-		return errors.New("Could not allocate webp picture")
+		return errors.New("could not allocate webp picture")
 	}
 	defer C.free_WebPPicture(pic)
 
@@ -548,7 +551,7 @@ func EncodeYUVA(w io.Writer, img *YUVAImage, c *Config) (err error) {
 	defer releaseDestinationManager(pic)
 
 	if C.WebPPictureInit(pic) == 0 {
-		return errors.New("Could not initialize webp picture")
+		return errors.New("could not initialize webp picture")
 	}
 	defer C.WebPPictureFree(pic)
 
@@ -566,12 +569,22 @@ func EncodeYUVA(w io.Writer, img *YUVAImage, c *Config) (err error) {
 	}
 
 	if C.webpEncodeYUVA(&c.c, pic, y, u, v, a) == 0 {
-		return fmt.Errorf("Encoding error: %d", pic.error_code)
+		return fmt.Errorf("encoding error: %d", pic.error_code)
 	}
 	return
 }
 
+// Encode writes the Image m to w in WebP format. Any Image may be
+// encoded, but images that are not [image.NRGBA] might be encoded lossily.
+func Encode(w io.Writer, img image.Image, c *Config) (err error) {
+	return EncodeRGBA(w, img, c)
+}
+
 func validateConfig(c *Config) error {
+	if c == nil {
+		return errors.New("config is nil")
+	}
+
 	if C.WebPValidateConfig(&c.c) == 0 {
 		return errors.New("invalid configuration")
 	}
