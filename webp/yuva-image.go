@@ -1,6 +1,8 @@
 package webp
 
-import "image"
+import (
+	"image"
+)
 
 // YUVAImage represents a image of YUV colors with alpha channel image.
 //
@@ -13,7 +15,6 @@ import "image"
 // YCbCr image.
 //
 // See: http://en.wikipedia.org/wiki/YCbCr
-//
 type YUVAImage struct {
 	Y, Cb, Cr, A []uint8
 	YStride      int
