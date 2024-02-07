@@ -2,7 +2,7 @@
 
 # go-libwebp
 
-[![GoDoc](https://pkg.go.dev/badge/github.com/Dadido3/go-libwebp/webp?utm_source=godoc)](https://pkg.go.dev/badge/github.com/Dadido3/go-libwebp/webp)
+[![GoDoc](https://pkg.go.dev/badge/github.com/Dadido3/go-libwebp/webp?utm_source=godoc)](https://pkg.go.dev/badge/github.com/Dadido3/go-libwebp/webp) ![Test State](https://github.com/Dadido3/go-libwebp/actions/workflows/test.yml/badge.svg)
 
 A implementation of Go binding for [libwebp](https://developers.google.com/speed/webp/docs/api).
 
