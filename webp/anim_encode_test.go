@@ -2,6 +2,7 @@ package webp_test
 
 import (
 	"image"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -10,16 +11,16 @@ import (
 )
 
 func TestEncodeAnimation(t *testing.T) {
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "cosmos.webp"))
 	aWebP, err := webp.DecodeRGBA(data, &webp.DecoderOptions{})
 	if err != nil {
 		t.Fatalf("Got Error: %v", err)
 	}
 
 	img := []image.Image{
-		util.ReadPNG("butterfly.png"),
-		util.ReadPNG("checkerboard.png"),
-		util.ReadPNG("yellow-rose-3.png"),
+		util.ReadPNG(filepath.Join(".", "..", "examples", "images", "butterfly.png")),
+		util.ReadPNG(filepath.Join(".", "..", "examples", "images", "checkerboard.png")),
+		util.ReadPNG(filepath.Join(".", "..", "examples", "images", "yellow-rose-3.png")),
 		aWebP,
 	}
 

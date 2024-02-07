@@ -2,6 +2,8 @@
 package main
 
 import (
+	"path/filepath"
+
 	"github.com/Dadido3/go-libwebp/test/util"
 	"github.com/Dadido3/go-libwebp/webp"
 )
@@ -10,7 +12,7 @@ func main() {
 	var err error
 
 	// Read binary data
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "images", "cosmos.webp"))
 
 	// Decode
 	options := &webp.DecoderOptions{}
@@ -19,5 +21,5 @@ func main() {
 		panic(err)
 	}
 
-	util.WritePNG(img, "encoded_cosmos.png")
+	util.WritePNG(img, filepath.Join(".", "..", "out", "encoded_cosmos.png"))
 }

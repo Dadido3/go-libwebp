@@ -2,6 +2,7 @@ package webp_test
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"github.com/Dadido3/go-libwebp/test/util"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestDecodeAnimationInfo(t *testing.T) {
-	data := util.ReadFile("weather-anim.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "weather-anim.webp"))
 
 	dec, err := webp.NewAnimationDecoder(data)
 	if err != nil {
@@ -37,7 +38,7 @@ func TestDecodeAnimationInfo(t *testing.T) {
 }
 
 func TestDecodeAnimation(t *testing.T) {
-	data := util.ReadFile("weather-anim.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "weather-anim.webp"))
 
 	dec, err := webp.NewAnimationDecoder(data)
 	if err != nil {
@@ -58,7 +59,7 @@ func TestDecodeAnimation(t *testing.T) {
 	}
 
 	for i := 0; i < 18; i++ {
-		frame := util.ReadPNG(fmt.Sprintf("weather-anim-frames/%02d.png", i))
+		frame := util.ReadPNG(filepath.Join(".", "..", "examples", "images", "weather-anim-frames", fmt.Sprintf("%02d.png", i)))
 		got := anim.Image[i]
 
 		for y := 0; y < got.Bounds().Dy(); y++ {

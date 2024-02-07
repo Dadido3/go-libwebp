@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/color"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/Dadido3/go-libwebp/test/util"
@@ -34,7 +35,7 @@ func TestGetDecoderVersion(t *testing.T) {
 }
 
 func TestGetInfo(t *testing.T) {
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "cosmos.webp"))
 	width, height := webp.GetInfo(data)
 
 	if width != 1024 {
@@ -46,7 +47,7 @@ func TestGetInfo(t *testing.T) {
 }
 
 func TestGetFeatures(t *testing.T) {
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "cosmos.webp"))
 	f, err := webp.GetFeatures(data)
 	if err != nil {
 		t.Errorf("Got Error: %v", err)
@@ -71,10 +72,10 @@ func TestGetFeatures(t *testing.T) {
 
 func TestDecodeYUV(t *testing.T) {
 	files := []string{
-		"cosmos.webp",
-		"butterfly.webp",
-		"kinkaku.webp",
-		"yellow-rose-3.webp",
+		filepath.Join(".", "..", "examples", "images", "cosmos.webp"),
+		filepath.Join(".", "..", "examples", "images", "butterfly.webp"),
+		filepath.Join(".", "..", "examples", "images", "kinkaku.webp"),
+		filepath.Join(".", "..", "examples", "images", "yellow-rose-3.webp"),
 	}
 
 	for _, file := range files {
@@ -91,10 +92,10 @@ func TestDecodeYUV(t *testing.T) {
 
 func TestDecodeRGBA(t *testing.T) {
 	files := []string{
-		"cosmos.webp",
-		"butterfly.webp",
-		"kinkaku.webp",
-		"yellow-rose-3.webp",
+		filepath.Join(".", "..", "examples", "images", "cosmos.webp"),
+		filepath.Join(".", "..", "examples", "images", "butterfly.webp"),
+		filepath.Join(".", "..", "examples", "images", "kinkaku.webp"),
+		filepath.Join(".", "..", "examples", "images", "yellow-rose-3.webp"),
 	}
 
 	for _, file := range files {
@@ -110,7 +111,7 @@ func TestDecodeRGBA(t *testing.T) {
 }
 
 func TestDecodeRGBAWithCropping(t *testing.T) {
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "cosmos.webp"))
 	crop := image.Rect(100, 100, 300, 200)
 
 	options := &webp.DecoderOptions{
@@ -128,7 +129,7 @@ func TestDecodeRGBAWithCropping(t *testing.T) {
 }
 
 func TestDecodeRGBAWithScaling(t *testing.T) {
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "cosmos.webp"))
 	scale := image.Rect(0, 0, 640, 480)
 
 	options := &webp.DecoderOptions{
@@ -150,14 +151,14 @@ func TestDecodeRGBAWithScaling(t *testing.T) {
 //
 
 func TestEncodeRGBA(t *testing.T) {
-	img := util.ReadPNG("yellow-rose-3.png")
+	img := util.ReadPNG(filepath.Join(".", "..", "examples", "images", "yellow-rose-3.png"))
 
 	config, err := webp.ConfigPreset(webp.PresetDefault, 100)
 	if err != nil {
 		t.Fatalf("got error: %v", err)
 	}
 
-	f := util.CreateFile("TestEncodeRGBA.webp")
+	f := util.CreateFile(filepath.Join(".", "..", "examples", "out", "TestEncodeRGBA.webp"))
 	w := bufio.NewWriter(f)
 	defer func() {
 		w.Flush()
@@ -171,14 +172,14 @@ func TestEncodeRGBA(t *testing.T) {
 }
 
 func TestEncodeRGB(t *testing.T) {
-	img := util.ReadPNG("yellow-rose-3.png")
+	img := util.ReadPNG(filepath.Join(".", "..", "examples", "images", "yellow-rose-3.png"))
 
 	config, err := webp.ConfigPreset(webp.PresetDefault, 100)
 	if err != nil {
 		t.Fatalf("got error: %v", err)
 	}
 
-	f := util.CreateFile("TestEncodeRGB.webp")
+	f := util.CreateFile(filepath.Join(".", "..", "examples", "out", "TestEncodeRGB.webp"))
 	w := bufio.NewWriter(f)
 	defer func() {
 		w.Flush()
@@ -192,7 +193,7 @@ func TestEncodeRGB(t *testing.T) {
 }
 
 func TestEncodeYUVA(t *testing.T) {
-	data := util.ReadFile("cosmos.webp")
+	data := util.ReadFile(filepath.Join(".", "..", "examples", "images", "cosmos.webp"))
 	options := &webp.DecoderOptions{}
 
 	img, err := webp.DecodeYUVA(data, options)
@@ -201,7 +202,7 @@ func TestEncodeYUVA(t *testing.T) {
 		return
 	}
 
-	f := util.CreateFile("TestEncodeYUVA.webp")
+	f := util.CreateFile(filepath.Join(".", "..", "examples", "out", "TestEncodeYUVA.webp"))
 	w := bufio.NewWriter(f)
 	defer func() {
 		w.Flush()
@@ -225,7 +226,7 @@ func TestEncodeGray(t *testing.T) {
 		p.SetGray(0, i, color.Gray{uint8(float32(i) / 10 * 255)})
 	}
 
-	f := util.CreateFile("TestEncodeGray.webp")
+	f := util.CreateFile(filepath.Join(".", "..", "examples", "out", "TestEncodeGray.webp"))
 	w := bufio.NewWriter(f)
 	defer func() {
 		w.Flush()

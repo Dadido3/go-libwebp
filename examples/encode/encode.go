@@ -4,16 +4,17 @@ package main
 import (
 	"bufio"
 	"image"
+	"path/filepath"
 
 	"github.com/Dadido3/go-libwebp/test/util"
 	"github.com/Dadido3/go-libwebp/webp"
 )
 
 func main() {
-	img := util.ReadPNG("cosmos.png")
+	img := util.ReadPNG(filepath.Join(".", "..", "images", "cosmos.png"))
 
 	// Create file and buffered writer
-	io := util.CreateFile("encoded_cosmos.webp")
+	io := util.CreateFile(filepath.Join(".", "..", "out", "encoded_cosmos.webp"))
 	w := bufio.NewWriter(io)
 	defer func() {
 		w.Flush()
