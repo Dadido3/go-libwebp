@@ -10,7 +10,13 @@ Forked from [tidbyt/go-libwebp](https://github.com/tidbyt/go-libwebp), which its
 
 ## Dependencies
 
-No external dependencies are needed, as this version of go-libwebp includes the libwebp 1.3.2 source.
+No external dependencies are needed, as this module includes the source code of libwebp 1.3.2.
+This has the advantage that you don't need to install any header files or SDKs.
+libwebp is automatically built by the go toolchain (With CGO), no matter the platform or architecture.
+
+For this to work you need a working CGO environment, which means you need to have GCC or a similar C compiler installed.
+
+Also, please open an issue if you need support for a newer version of libwebp.
 
 ## Usage
 
