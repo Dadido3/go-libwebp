@@ -1,1 +1,2 @@
 libwebp/** linguist-vendored
+generated_*.c linguist-generated
